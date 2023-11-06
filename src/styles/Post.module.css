@@ -1,0 +1,12 @@
+.postCard {
+  background-color: #79c753;
+}
+
+.cardBody {
+  overflow: hidden;
+  mask-image: linear-gradient(180deg, #000 60%, transparent);
+}
+
+.postText {
+  white-space: pre-line;
+}

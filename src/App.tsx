@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import './App.css';
-import { Post } from './models/post';
+import { Post as PostModel } from './models/post';
+import Post from './components/Post';
+import { Col, Container, Row } from 'react-bootstrap';
+import styles from './styles/Posts.module.css';
 
-function App() {
-  const [posts, setPosts] = useState<Post[]>([]);
+const App = () => {
+  const [posts, setPosts] = useState<PostModel[]>([]);
 
   useEffect(() => {
     async function loadPosts() {
@@ -22,10 +24,16 @@ function App() {
   }, []);
 
   return (
-    <div className='App'>
-      {JSON.stringify(posts)}
-    </div>
+    <Container>
+      <Row xs={1} md={2} lg={3} className='g-4'>
+        {posts.map((post) => (
+          <Col key={post._id}>
+            <Post post={post} className={styles.post} />
+          </Col>
+        ))}
+      </Row>
+    </Container>
   );
-}
+};
 
 export default App;
