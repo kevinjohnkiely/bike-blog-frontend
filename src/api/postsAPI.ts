@@ -34,3 +34,18 @@ export async function createPost(post: PostInput): Promise<Post> {
   });
   return response.json();
 }
+
+export async function editPost(postId: string, post: PostInput): Promise<Post> {
+  const response = await fetchData(`/api/posts/${postId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(post),
+  });
+  return response.json();
+}
+
+export async function deletePost(postId: string) {
+  await fetchData(`/api/posts/${postId}`, { method: 'DELETE' });
+}

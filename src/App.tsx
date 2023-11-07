@@ -5,11 +5,13 @@ import { Button, Col, Container, Row } from 'react-bootstrap';
 import styles from './styles/Posts.module.css';
 import styleUtils from './styles/utils.module.css';
 import * as PostsApi from './api/postsAPI';
-import AddPostModal from './components/AddPostModal';
+import { FaPlus } from 'react-icons/fa';
+import AddEditPostModal from './components/AddEditPostModal';
 
 const App = () => {
   const [posts, setPosts] = useState<PostModel[]>([]);
   const [showAddPostModal, setShowAddPostModal] = useState(false);
+  const [postToEdit, setPostToEdit] = useState<PostModel | null>(null);
 
   useEffect(() => {
     async function loadPosts() {
@@ -24,22 +26,59 @@ const App = () => {
     loadPosts();
   }, []);
 
+  async function deletePost(post: PostModel) {
+    try {
+      await PostsApi.deletePost(post._id);
+      setPosts(posts.filter((existingPost) => existingPost._id !== post._id));
+    } catch (error) {
+      console.error(error);
+      alert(error);
+    }
+  }
+
   return (
     <Container>
-      <Button className={`mb-4 ${styleUtils.blockCenter}`} onClick={() => setShowAddPostModal(true)}>Add New Post</Button>
+      <Button
+        className={`mb-4 ${styleUtils.blockCenter} ${styleUtils.flexCenter}`}
+        onClick={() => setShowAddPostModal(true)}
+      >
+        <FaPlus />
+        Add New Post
+      </Button>
       <Row xs={1} md={2} lg={3} className='g-4'>
         {posts.map((post) => (
           <Col key={post._id}>
-            <Post post={post} className={styles.post} />
+            <Post
+              post={post}
+              className={styles.post}
+              onDeletePostClicked={deletePost}
+              onPostClicked={setPostToEdit}
+            />
           </Col>
         ))}
       </Row>
       {showAddPostModal && (
-        <AddPostModal
+        <AddEditPostModal
           onDismiss={() => setShowAddPostModal(false)}
           onPostSaved={(newPost) => {
             setPosts([...posts, newPost]);
             setShowAddPostModal(false);
+          }}
+        />
+      )}
+      {postToEdit && (
+        <AddEditPostModal
+          postToEdit={postToEdit}
+          onDismiss={() => setPostToEdit(null)}
+          onPostSaved={(updatedPost) => {
+            setPosts(
+              posts.map((existingPost) =>
+                existingPost._id === updatedPost._id
+                  ? updatedPost
+                  : existingPost
+              )
+            );
+            setPostToEdit(null);
           }}
         />
       )}

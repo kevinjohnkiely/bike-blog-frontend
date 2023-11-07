@@ -4,21 +4,38 @@ import { useForm } from 'react-hook-form';
 import { PostInput } from '../api/postsAPI';
 import * as PostsApi from '../api/postsAPI';
 
-interface AddPostModalProps {
+interface AddEditPostModalProps {
+  postToEdit?: Post;
   onDismiss: () => void;
   onPostSaved: (post: Post) => void;
 }
 
-const AddPostModal = ({ onDismiss, onPostSaved }: AddPostModalProps) => {
+const AddEditPostModal = ({
+  onDismiss,
+  onPostSaved,
+  postToEdit,
+}: AddEditPostModalProps) => {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<PostInput>();
+  } = useForm<PostInput>({
+    defaultValues: {
+      title: postToEdit?.title || '',
+      text: postToEdit?.text || '',
+    },
+  });
 
   async function onSubmit(input: PostInput) {
     try {
-      const postResponse = await PostsApi.createPost(input);
+      let postResponse: Post;
+
+      if (postToEdit) {
+        postResponse = await PostsApi.editPost(postToEdit._id, input);
+      } else {
+        postResponse = await PostsApi.createPost(input);
+      }
+
       onPostSaved(postResponse);
     } catch (error) {
       console.error(error);
@@ -29,10 +46,10 @@ const AddPostModal = ({ onDismiss, onPostSaved }: AddPostModalProps) => {
   return (
     <Modal show onHide={onDismiss}>
       <Modal.Header closeButton>
-        <Modal.Title>Add New Post</Modal.Title>
+        <Modal.Title>{postToEdit ? "Edit Post": "Add New Post"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form id='addPostForm' onSubmit={handleSubmit(onSubmit)}>
+        <Form id='addEditPostForm' onSubmit={handleSubmit(onSubmit)}>
           <Form.Group className='mb-3'>
             <Form.Label>Title</Form.Label>
             <Form.Control
@@ -65,7 +82,7 @@ const AddPostModal = ({ onDismiss, onPostSaved }: AddPostModalProps) => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button type='submit' form='addPostForm' disabled={isSubmitting}>
+        <Button type='submit' form='addEditPostForm' disabled={isSubmitting}>
           Submit
         </Button>
       </Modal.Footer>
@@ -73,4 +90,4 @@ const AddPostModal = ({ onDismiss, onPostSaved }: AddPostModalProps) => {
   );
 };
 
-export default AddPostModal;
+export default AddEditPostModal;
