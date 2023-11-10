@@ -3,6 +3,7 @@ import { Post } from '../models/post';
 import { useForm } from 'react-hook-form';
 import { PostInput } from '../api/postsAPI';
 import * as PostsApi from '../api/postsAPI';
+import TextInputField from './form/TextInputField';
 
 interface AddEditPostModalProps {
   postToEdit?: Post;
@@ -46,39 +47,29 @@ const AddEditPostModal = ({
   return (
     <Modal show onHide={onDismiss}>
       <Modal.Header closeButton>
-        <Modal.Title>{postToEdit ? "Edit Post": "Add New Post"}</Modal.Title>
+        <Modal.Title>{postToEdit ? 'Edit Post' : 'Add New Post'}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form id='addEditPostForm' onSubmit={handleSubmit(onSubmit)}>
-          <Form.Group className='mb-3'>
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              type='text'
-              placeholder='Title'
-              isInvalid={!!errors.title}
-              {...register('title', {
-                required: 'Post title is required!',
-              })}
-            />
-            <Form.Control.Feedback type='invalid'>
-              {errors.title?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
-          <Form.Group className='mb-3'>
-            <Form.Label>Text</Form.Label>
-            <Form.Control
-              as='textarea'
-              rows={5}
-              placeholder='Text'
-              isInvalid={!!errors.text}
-              {...register('text', {
-                required: 'Post text content is required!',
-              })}
-            />
-            <Form.Control.Feedback type='invalid'>
-              {errors.text?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
+          <TextInputField
+            name='title'
+            label='Title'
+            type='text'
+            placeholder='Post Title'
+            register={register}
+            registerOptions={{ required: 'Post title is required' }}
+            error={errors.title}
+          />
+          <TextInputField
+            name='text'
+            label='Text'
+            as='textarea'
+            rows={5}
+            placeholder='Post Text'
+            register={register}
+            registerOptions={{ required: 'Post text is required' }}
+            error={errors.text}
+          />
         </Form>
       </Modal.Body>
       <Modal.Footer>
